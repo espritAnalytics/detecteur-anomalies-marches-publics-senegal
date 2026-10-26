@@ -26,10 +26,14 @@ source:
   url: "https://www.data.gouv.fr/api/1/datasets/r/7f2fe3c4-7883-43c7-b46a-c915a4101963"
   # À COMPLÉTER après téléchargement effectif :
   fichier: "data/brut/attributions.csv"
-  encodage: null          # probablement latin-1 — à confirmer au profilage
-  separateur: null        # probablement ";" — à confirmer au profilage
+  encodage: "utf-8"       # confirmé au profilage du 2026-10-26
+  separateur: ","         # confirmé au profilage du 2026-10-26
   periode_annoncee: "2010-T1 à 2013-T1"
   lignes_annoncees: 4863
+  # Constaté au profilage :
+  periode_reelle: "2010-01-04 à 2013-03-29"
+  lignes_reelles: 4842          # écart de 21 lignes à expliquer
+  exercices_complets: [2010, 2011, 2012]   # 2009 et 2013 tronqués
 
 
 # -----------------------------------------------------------------------------
