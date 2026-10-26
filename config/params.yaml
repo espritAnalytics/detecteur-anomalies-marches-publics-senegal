@@ -23,6 +23,7 @@ source:
   nom: "Attributions de marchés publics du Sénégal"
   origine: "data.gouv.fr (moissonnage de nosdonnees.fr)"
   producteur_initial: "portail marchespublics.sn"
+  url: "https://www.data.gouv.fr/api/1/datasets/r/7f2fe3c4-7883-43c7-b46a-c915a4101963"
   # À COMPLÉTER après téléchargement effectif :
   fichier: "data/brut/attributions.csv"
   encodage: null          # probablement latin-1 — à confirmer au profilage
