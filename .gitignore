@@ -1,0 +1,35 @@
+# --- Secrets et pseudonymisation -------------------------------------------
+# Le sel ne doit JAMAIS être versionné : sans lui la pseudonymisation
+# du dépôt public est irréversible, avec lui elle ne vaut rien.
+.env
+.sel
+*.key
+
+# --- Données ----------------------------------------------------------------
+# Le fichier source est public mais n'a pas à être versionné :
+# il se retélécharge, et le dépôt reste léger.
+data/brut/*
+data/travail/*
+!data/brut/.gitkeep
+!data/travail/.gitkeep
+
+# Table de correspondance des identités réelles — strictement locale
+correspondance_*.csv
+
+# --- Sorties ----------------------------------------------------------------
+sorties/*
+!sorties/.gitkeep
+
+# --- Python -----------------------------------------------------------------
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Éditeurs et système ----------------------------------------------------
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

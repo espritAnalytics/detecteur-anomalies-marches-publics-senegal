@@ -1,0 +1,184 @@
+# =============================================================================
+# Paramètres du détecteur d'anomalies — commande publique sénégalaise
+# =============================================================================
+#
+# RÈGLE MÉTHODOLOGIQUE : ces paramètres se fixent AVANT de lancer les tests.
+# Les ajuster après avoir vu les résultats revient à choisir ses conclusions.
+# Toute modification postérieure au premier lancement doit être datée et
+# justifiée dans JOURNAL.md.
+#
+# Aucun paramètre ne doit être écrit en dur dans le code.
+# =============================================================================
+
+projet:
+  nom: "Détecteur d'anomalies — commande publique sénégalaise"
+  version: "0.1.0"
+  devise: "FCFA"
+
+
+# -----------------------------------------------------------------------------
+# SOURCE DES DONNÉES
+# -----------------------------------------------------------------------------
+source:
+  nom: "Attributions de marchés publics du Sénégal"
+  origine: "data.gouv.fr (moissonnage de nosdonnees.fr)"
+  producteur_initial: "portail marchespublics.sn"
+  # À COMPLÉTER après téléchargement effectif :
+  fichier: "data/brut/attributions.csv"
+  encodage: null          # probablement latin-1 — à confirmer au profilage
+  separateur: null        # probablement ";" — à confirmer au profilage
+  periode_annoncee: "2010-T1 à 2013-T1"
+  lignes_annoncees: 4863
+
+
+# -----------------------------------------------------------------------------
+# SEUILS RÉGLEMENTAIRES DE PASSATION
+# -----------------------------------------------------------------------------
+# ATTENTION — valeurs issues de sources secondaires, NON ENCORE VÉRIFIÉES
+# dans les textes officiels. À confirmer avant tout usage :
+#   - article 53 du Code des marchés publics (seuils d'appel d'offres)
+#   - arrêté n° 007118 du 23 mars 2023 (seuils et modalités des DRP)
+#
+# Un seuil inventé ou périmé invalide le test de fractionnement en entier.
+# Mettre "verifie: true" une fois la lecture faite, avec la date.
+# -----------------------------------------------------------------------------
+seuils:
+  verifie: false
+  verifie_le: null
+  verifie_par: null
+
+  regimes:
+
+    - id: "avant_2014"
+      date_debut: "2000-01-01"
+      date_fin: "2014-10-31"        # date exacte à confirmer
+      texte: "Code des marchés publics antérieur au décret 2014-1212"
+      type_autorite: "ETAT_CT_EP"
+      procedure: "APPEL_OFFRES_OUVERT"
+      montants:
+        TRAVAUX: 25000000
+        FOURNITURES_SERVICES: 15000000
+        PRESTATIONS_INTELLECTUELLES: 25000000
+
+    - id: "depuis_2014"
+      date_debut: "2014-11-01"       # date exacte à confirmer
+      date_fin: null                 # null = en vigueur
+      texte: "Décret 2014-1212, confirmé par décret 2022-2295 art. 53"
+      type_autorite: "ETAT_CT_EP"
+      procedure: "APPEL_OFFRES_OUVERT"
+      montants:
+        TRAVAUX: 70000000
+        FOURNITURES_SERVICES: 50000000
+        PRESTATIONS_INTELLECTUELLES: 50000000
+
+    - id: "societes_agences_2022"
+      date_debut: "2023-01-26"       # publication JO n° 7592
+      date_fin: null
+      texte: "Décret 2022-2295 art. 53"
+      type_autorite: "SOCIETE_AGENCE"
+      procedure: "APPEL_OFFRES_OUVERT"
+      montants:
+        TRAVAUX: 100000000
+        FOURNITURES_SERVICES: 60000000
+        PRESTATIONS_INTELLECTUELLES: 60000000
+
+
+# -----------------------------------------------------------------------------
+# TEST 1 — LOI DE BENFORD
+# -----------------------------------------------------------------------------
+benford:
+  actif: true
+  montant_minimum: 1000           # exclut les montants trop petits
+  effectif_minimum_groupe: 300    # en deçà, le test n'est pas interprétable
+  chiffres_testes: [1, 2]         # premier et second chiffre significatif
+  mailles:                        # groupes sur lesquels le test est appliqué
+    - "ensemble"
+    - "type_marche"
+    - "type_autorite"
+  # Seuils MAD de Nigrini (premier chiffre)
+  mad_seuils:
+    conformite_etroite: 0.006
+    acceptable: 0.012
+    marginal: 0.015
+  # Test complémentaire : montants ronds
+  nombres_ronds:
+    actif: true
+    multiples: [1000000, 5000000, 10000000]
+
+
+# -----------------------------------------------------------------------------
+# TEST 2 — FRACTIONNEMENT ET AMASSEMENT SOUS LES SEUILS
+# -----------------------------------------------------------------------------
+fractionnement:
+  actif: true
+
+  # Volet A : marchés isolés situés juste sous un seuil
+  sous_seuil:
+    bande_inferieure: [0.90, 1.00]   # ratio montant / seuil applicable
+    bande_superieure: [1.00, 1.10]
+    indice_alerte: 2.0               # rapport inf/sup au-delà duquel on signale
+    plage_histogramme: [0.70, 1.30]
+    pas_histogramme: 0.01
+
+  # Volet B : groupes de marchés dont le cumul franchit le seuil
+  groupement:
+    fenetre_jours: 90                # fenêtre glissante
+    marches_minimum: 3               # taille minimale du groupe
+    meme_fournisseur: true
+    meme_autorite: true
+    # un groupe est signalé si son cumul dépasse le seuil
+    # alors qu'aucun marché ne le dépasse individuellement
+
+
+# -----------------------------------------------------------------------------
+# TEST 3 — CONCENTRATION DE FOURNISSEURS
+# -----------------------------------------------------------------------------
+concentration:
+  actif: true
+  marches_minimum_autorite: 10     # en deçà, aucun couple n'est évalué
+  part_montant_alerte: 0.50        # part captée par un seul fournisseur
+  part_nombre_alerte: 0.40
+  hhi_alerte: 2500                 # indice de Herfindahl par autorité (0-10000)
+  # Si un test de significativité est ajouté plus tard, la correction
+  # pour tests multiples est obligatoire (plusieurs milliers de couples).
+  test_statistique:
+    actif: false
+    methode: "binomial"
+    correction: "fdr_bh"
+    alpha: 0.05
+
+
+# -----------------------------------------------------------------------------
+# TEST 4 — CONCENTRATION EN FIN D'EXERCICE
+# -----------------------------------------------------------------------------
+fin_exercice:
+  actif: true
+  mois_cible: [12]                 # décembre
+  # RÉFÉRENCE : surtout PAS 1/12. La concentration de fin d'exercice est
+  # systémique dans la dépense publique — comparer à l'uniformité théorique
+  # signalerait toutes les autorités et ne discriminerait rien.
+  # La seule référence valide est la distribution observée des autres autorités.
+  reference: "distribution_empirique"
+  percentile_alerte: 90            # au-delà du 90e centile des autres autorités
+  marches_minimum_autorite: 10
+
+
+# -----------------------------------------------------------------------------
+# RESTITUTION PUBLIQUE
+# -----------------------------------------------------------------------------
+# Contrainte éthique : méthode et résultats agrégés, aucune désignation
+# nominative. Le sel de pseudonymisation n'est JAMAIS versionné.
+# -----------------------------------------------------------------------------
+restitution:
+  pseudonymiser: true
+  sel_fichier: ".sel"              # hors dépôt, listé dans .gitignore
+  agregation_minimale: 5           # pas de catégorie sous 5 entités
+  vocabulaire_interdit:
+    - "fraude"
+    - "irrégularité"
+    - "suspect"
+    - "corruption"
+  vocabulaire_retenu:
+    - "atypie statistique"
+    - "signal nécessitant investigation"
+    - "écart à la distribution attendue"

@@ -1,0 +1,11 @@
+# Détecteur d'anomalies — commande publique sénégalaise
+# Installation : pip install -r requirements.txt
+
+pandas==2.2.3            # chargement et nettoyage
+psycopg[binary]==3.2.3   # connexion PostgreSQL
+SQLAlchemy==2.0.36       # écriture en base depuis pandas
+PyYAML==6.0.2            # lecture des paramètres
+python-dotenv==1.0.1     # identifiants hors du code
+matplotlib==3.9.2        # graphiques Benford et saisonnalité
+tabulate==0.9.0          # tableaux lisibles en sortie console
+pytest==8.3.4            # tests des fonctions de nettoyage et de calcul
