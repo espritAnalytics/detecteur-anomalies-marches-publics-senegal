@@ -184,7 +184,7 @@ Trois couches dans la base, dans l'esprit de dbt :
 |---|---|---|
 | `brut` | Copie fidèle du fichier source, tout en texte | On n'y touche plus jamais. C'est la piste d'audit. |
 | `propre` | Types corrigés, montants numériques, dates normalisées, noms harmonisés | Une transformation par règle, documentée |
-| `analyse` | Marchés enrichis du seuil applicable, agrégats par fournisseur et autorité | Consommable par les tests et la restitution |
+| `analytique` | Marchés enrichis du seuil applicable, agrégats par fournisseur et autorité | Consommable par les tests et la restitution |
 
 **Pourquoi garder la couche brute intacte :** à tout moment on doit pouvoir
 remonter d'un constat jusqu'à la ligne d'origine du fichier. Sans cela aucun

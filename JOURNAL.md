@@ -12,6 +12,23 @@ suivi de tutoriel.
 
 ---
 
+## 2026-10-26 — La couche « analyse » renommée « analytique »
+
+**Contexte.** `CREATE SCHEMA analyse` échoue : erreur de syntaxe.
+
+**Cause.** `ANALYSE` (et `ANALYZE`) est un mot-clé réservé de PostgreSQL — c'est
+la commande qui met à jour les statistiques du planificateur de requêtes.
+
+**Décision.** Renommer la couche en `analytique` plutôt que de la mettre entre
+guillemets doubles partout. Un identifiant entre guillemets devient sensible à
+la casse et doit être cité dans chaque requête, chaque script et chaque
+connexion d'outil — une nuisance permanente pour éviter un renommage de cinq
+minutes.
+
+**Portée.** `sql/00_schemas.sql` et `README.md`. Aucune donnée chargée à ce stade.
+
+---
+
 ## 2026-10-26 — Mise en place de l'environnement
 
 **Contexte.** Démarrage du projet.

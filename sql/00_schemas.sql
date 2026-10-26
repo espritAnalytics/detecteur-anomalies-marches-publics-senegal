@@ -17,7 +17,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 -- --- Couches -----------------------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS brut;
 CREATE SCHEMA IF NOT EXISTS propre;
-CREATE SCHEMA IF NOT EXISTS analyse;
+CREATE SCHEMA IF NOT EXISTS analytique;
 
 COMMENT ON SCHEMA brut IS
   'Copie fidèle du fichier source, tous champs en texte. Jamais modifiée après '
@@ -28,7 +28,7 @@ COMMENT ON SCHEMA propre IS
   'Types corrigés, montants numériques, dates normalisées, libellés harmonisés. '
   'Une transformation par règle, chacune documentée dans JOURNAL.md.';
 
-COMMENT ON SCHEMA analyse IS
+COMMENT ON SCHEMA analytique IS
   'Marchés enrichis du seuil applicable et agrégats par fournisseur et autorité. '
   'Couche consommée par les tests et par la restitution.';
 
